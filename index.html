@@ -288,6 +288,20 @@
         });
     </script>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        // Подстраиваем размеры под экран
+        tg.expand();
+
+        // Пример кнопки "Закрыть" внутри Web App
+        tg.MainButton.text = "Закрыть";
+        tg.MainButton.show();
+
+        // Можно получить данные о пользователе
+        console.log(tg.initDataUnsafe.user);
+    </script>
 </body>
 
 </html>
