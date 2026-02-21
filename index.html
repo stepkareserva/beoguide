@@ -60,6 +60,7 @@
 
         a {
             font-family: "CrayonLibre", sans-serif;
+            color: #F2A65A;
         }
 
         .toggle-list {
@@ -169,17 +170,17 @@
 
         <div class="toggle-list">
             <div class="toggle-item">
-                <span class="label">Красивая собака</span>
+                <span class="label">Специальный Спешлти Кофе</span>
                 <div class="toggle" data-state="neutral"></div>
             </div>
 
             <div class="toggle-item">
-                <span class="label">Отличный кофе</span>
+                <span class="label">Хенди-мейди Настойки</span>
                 <div class="toggle" data-state="neutral"></div>
             </div>
 
             <div class="toggle-item">
-                <span class="label">Настойки</span>
+                <span class="label">Красивая интерактивная собака</span>
                 <div class="toggle" data-state="neutral"></div>
             </div>
         </div>
@@ -197,9 +198,9 @@
         const toggles = Array.from(document.querySelectorAll(".toggle"));
 
         const places = [
-            { name: "Lepo Flašice", url: "https://www.instagram.com/lepo.flasice/", avatar: "/avatars/lepo_flasice.jpg" },
-            { name: "Ca Ca Fe", url: "https://www.instagram.com/ca.ca.fe/", avatar: "/avatars/cacafe.jpg" },
             { name: "Gosti", url: "https://www.instagram.com/gosti.beo/", avatar: "/avatars/gosti.beo.jpg" },
+            { name: "Ca Ca Fe", url: "https://www.instagram.com/ca.ca.fe/", avatar: "/avatars/cacafe.jpg" },
+            { name: "Flašice", url: "https://www.instagram.com/lepo.flasice/", avatar: "/avatars/lepo_flasice.jpg" },
         ];
 
         const result = document.getElementById("result");
@@ -291,16 +292,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
-
-        // Подстраиваем размеры под экран
         tg.expand();
-
-        // Пример кнопки "Закрыть" внутри Web App
         tg.MainButton.text = "Закрыть";
         tg.MainButton.show();
-
-        // Можно получить данные о пользователе
-        console.log(tg.initDataUnsafe.user);
     </script>
 </body>
 
