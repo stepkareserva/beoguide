@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Belgrade weekend breakfast guide</title>
+
+    <!-- ✅ СТИЛИ -->
+    <style>
+        :root {
+            --bg: #fafafa;
+            --text: #1f2937;
+            --on: #22c55e;
+            --off: #ef4444;
+            --neutral: #d1d5db;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: "Krivulya";
+            src: url("/fonts/Krivulya Regular.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "CrayonLibre";
+            src: url("/fonts/CrayonLibre-Regular.otf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: "Krivulya", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .page {
+            padding: 16px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: "CrayonLibre", sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            color: #E58DA0;
+        }
+
+        a {
+            font-family: "CrayonLibre", sans-serif;
+        }
+
+        .toggle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 2.0rem;
+        }
+
+        .toggle {
+            width: 52px;
+            height: 28px;
+            border-radius: 999px;
+            background: var(--neutral);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle[data-state="neutral"]::after {
+            transform: translateX(12px);
+        }
+
+        .toggle[data-state="on"] {
+            background: var(--on);
+        }
+
+        .toggle[data-state="on"]::after {
+            transform: translateX(24px);
+        }
+
+        .toggle[data-state="off"] {
+            background: var(--off);
+        }
+
+        /* ---------- RESULT ---------- */
+
+        #result {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #result[hidden] {
+            display: none;
+        }
+
+        #result-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+        }
+
+        #result-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #e5e7eb;
+        }
+
+        #result-name {
+            font-size: 2.0rem;
+            font-weight: 600;
+        }
+
+        #result {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        #result.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="0" height="0">
+        <filter id="rough">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+        </filter>
+    </svg>
+    <main class="page">
+        <h1>
+            Belgrade weekend breakfast guide
+        </h1>
+
+        <div class="toggle-list">
+            <div class="toggle-item">
+                <span class="label">Красивая собака</span>
+                <div class="toggle" data-state="neutral"></div>
+            </div>
+
+            <div class="toggle-item">
+                <span class="label">Отличный кофе</span>
+                <div class="toggle" data-state="neutral"></div>
+            </div>
+
+            <div class="toggle-item">
+                <span class="label">Настойки</span>
+                <div class="toggle" data-state="neutral"></div>
+            </div>
+        </div>
+
+        <div id="result" hidden>
+            <a id="result-link" href="#" target="_blank" rel="noopener">
+                <img id="result-avatar" src="/avatar-placeholder.png" alt="" />
+                <span id="result-name"></span>
+            </a>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/rough-notation/lib/rough-notation.iife.js"></script>
+    <script>
+        const toggles = Array.from(document.querySelectorAll(".toggle"));
+
+        const places = [
+            { name: "Lepo Flašice", url: "https://www.instagram.com/lepo.flasice/", avatar: "/avatars/lepo_flasice.jpg" },
+            { name: "Ca Ca Fe", url: "https://www.instagram.com/ca.ca.fe/", avatar: "/avatars/cacafe.jpg" },
+            { name: "Gosti", url: "https://www.instagram.com/gosti.beo/", avatar: "/avatars/gosti.beo.jpg" },
+        ];
+
+        const result = document.getElementById("result");
+        const resultLink = document.getElementById("result-link");
+
+        const resultAvatar = document.getElementById("result-avatar");
+
+        const resultName = document.getElementById("result-name");
+
+        let annotation = null; // храним аннотацию
+
+        function countOff(states) {
+            return states.filter(s => s === "off").length;
+        }
+
+        function toggleState(state) {
+            return state === "on" ? "off" : state === "off" ? "on" : state;
+        }
+
+
+        function updateResult() {
+            const states = toggles.map(t => t.dataset.state);
+
+            if (states.includes("neutral") || countOff(states) !== 1) {
+                result.hidden = true;
+                result.classList.remove("show");
+                return;
+            }
+
+            const offIndex = states.indexOf("off");
+            const place = places[offIndex];
+
+            resultLink.href = place.url;
+            resultName.textContent = place.name;
+            resultAvatar.src = place.avatar;
+            result.hidden = false;
+            result.classList.add("show");
+
+            // создаём аннотацию **только если её ещё нет**
+            if (annotation) {
+                annotation.hide()
+            }
+            annotation = RoughNotation.annotate(resultLink, {
+                type: "circle",
+                color: "#F2A65A",
+                padding: 12,
+                strokeWidth: 5,
+                roughness: 6,
+                animate: true // мгновенное появление
+            });
+            annotation.show();
+        }
+
+        const el = document.querySelector("#result-link");
+
+
+
+        toggles.forEach(clicked => {
+            clicked.addEventListener("click", () => {
+                clicked.dataset.state =
+                    clicked.dataset.state === "neutral"
+                        ? "on"
+                        : clicked.dataset.state === "on"
+                            ? "off"
+                            : "on";
+
+                const states = toggles.map(t => t.dataset.state);
+
+                if (!states.includes("neutral") && countOff(states) !== 1) {
+                    const others = toggles.filter(t => t !== clicked);
+                    const valid = others.filter(c => {
+                        const simulated = toggles.map(t =>
+                            t === c ? toggleState(t.dataset.state) : t.dataset.state
+                        );
+                        return countOff(simulated) === 1;
+                    });
+
+                    if (valid.length) {
+                        const chosen = valid[Math.floor(Math.random() * valid.length)];
+                        chosen.dataset.state = toggleState(chosen.dataset.state);
+                    }
+                }
+
+                updateResult();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
