@@ -60,6 +60,12 @@
             color: #F2A65A;
         }
 
+        #result {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #F2A65A;
+        }
+
         .toggle-list {
             display: grid;
             row-gap: 12px;
@@ -175,7 +181,7 @@
             display: none;
         }
 
-        #result-link {
+        #result-block>a {
             display: flex;
             align-items: center;
             gap: 16px;
@@ -246,11 +252,8 @@
                 <div class="toggle" data-index="2" data-state="neutral"></div>
             </div>
         </div>
-        <div id="result" hidden>
-            <a id="result-link" href="#" target="_blank" rel="noopener">
-                <img id="result-avatar" src="/avatar-placeholder.png" alt="" />
-                <span id="result-name"></span>
-            </a>
+        <div id="result">
+            <span id="show-result" class="action-text">Узнать результат</span>
         </div>
     </main>
 
@@ -258,14 +261,29 @@
     <script>
         const toggles = Array.from(document.querySelectorAll(".toggle"));
         const places = [
-            { name: "Gosti", url: "https://www.instagram.com/gosti.beo/", avatar: "/avatars/gosti.beo.jpg" },
-            { name: "Ca Ca Fe", url: "https://www.instagram.com/ca.ca.fe/", avatar: "/avatars/cacafe.jpg" },
-            { name: "Flašice", url: "https://www.instagram.com/lepo.flasice/", avatar: "/avatars/lepo_flasice.jpg" }
+            `<div id="result-block">
+                <a id="result-link" href="https://www.instagram.com/gosti.beo/" target="_blank" rel="noopener">
+                    <img id="result-avatar" src="/avatars/gosti.beo.jpg" alt="" />
+                    <span id="result-name">Gosti</span>
+                </a>           
+            </div>`,
+            `<div id="result-block">
+                <a id="result-link" href="https://www.instagram.com/ca.ca.fe/" target="_blank" rel="noopener">
+                    <img id="result-avatar" src="/avatars/cacafe.jpg" alt="" />
+                    <span id="result-name">Ca.Ca.Fe</span>
+                </a>
+            </div>`,
+            `<div id="result-block">
+                <a id="result-link" href="https://www.instagram.com/lepo_flasice/" target="_blank" rel="noopener">
+                    <img id="result-avatar" src="/avatars/lepo_flasice.jpg" alt="" />
+                    <span id="result-name">Flašice</span>
+                </a> 
+            </div>`,
         ];
         const result = document.getElementById("result");
-        const resultLink = document.getElementById("result-link");
-        const resultAvatar = document.getElementById("result-avatar");
-        const resultName = document.getElementById("result-name");
+        // const resultLink = document.getElementById("result-link");
+        // const resultAvatar = document.getElementById("result-avatar");
+        // const resultName = document.getElementById("result-name");
         let annotation = null;
 
         function countOff(states) {
@@ -306,23 +324,32 @@
         }
         moveArrow(0);
 
+        let resultShown = false;
         function updateResult() {
             const states = toggles.map(t => t.dataset.state);
             if (states.includes("neutral") || countOff(states) !== 1) {
                 return;
             }
+            if (!resultShown) {
+                result.hidden = false;
+                result.classList.add("show");
+                resultShown = true;
+                return;
+            }
             const offIndex = states.indexOf("off");
             const place = places[offIndex];
-            resultLink.href = place.url;
-            resultName.textContent = place.name;
-            resultAvatar.src = place.avatar;
+            result.innerHTML = place;
+            // = place.url;
+            //resultName.textContent = place.name;
+            //resultAvatar.src = place.avatar;
             result.hidden = false;
             result.classList.add("show");
             if (annotation) annotation.hide();
+            const resultLink = document.getElementById("result-block");
             annotation = RoughNotation.annotate(resultLink, {
                 type: "circle",
                 color: "#F2A65A",
-                padding: 12,
+                padding: 0,
                 strokeWidth: 5,
                 roughness: 6,
                 animate: true
@@ -351,6 +378,10 @@
                 const idx = Number(clicked.dataset.index);
                 moveArrow(idx + 1);
             });
+        });
+
+        document.getElementById("show-result").addEventListener("click", () => {
+            updateResult();
         });
     </script>
 
