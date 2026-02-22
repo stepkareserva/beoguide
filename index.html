@@ -333,7 +333,6 @@
             if (!resultShown) {
                 result.hidden = false;
                 result.classList.add("show");
-                resultShown = true;
                 return;
             }
             const offIndex = states.indexOf("off");
@@ -381,6 +380,7 @@
         });
 
         document.getElementById("show-result").addEventListener("click", () => {
+            resultShown = true;
             updateResult();
         });
     </script>
