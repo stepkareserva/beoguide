@@ -70,11 +70,18 @@
             display: table-row;
         }
 
+        .toggle-row .arrow,
         .toggle-row .label,
         .toggle-row .toggle {
             display: table-cell;
             vertical-align: middle;
-            padding: 0;
+        }
+
+        .toggle-row .arrow {
+            width: 24px;
+            text-align: center;
+            font-size: 1.6rem;
+            color: #E58DA0;
         }
 
         .toggle-row .label {
@@ -130,6 +137,11 @@
             transform: translateX(0);
         }
 
+        .toggle-row.is-disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
         #result {
             margin-top: 32px;
             display: flex;
@@ -178,16 +190,21 @@
         <h1>Belgrade weekend breakfast guide</h1>
         <div class="toggle-list">
             <div class="toggle-row">
+                <span class="arrow">→</span>
                 <span class="label">Специальный Спешлти Кофе</span>
-                <div class="toggle" data-state="neutral"></div>
+                <div class="toggle" data-index="0" data-state="neutral"></div>
             </div>
+
             <div class="toggle-row">
+                <span class="arrow"></span>
                 <span class="label">Хенди-мейди Настойки</span>
-                <div class="toggle" data-state="neutral"></div>
+                <div class="toggle" data-index="1" data-state="neutral"></div>
             </div>
+
             <div class="toggle-row">
+                <span class="arrow"></span>
                 <span class="label">Красивая интерактивная собака</span>
-                <div class="toggle" data-state="neutral"></div>
+                <div class="toggle" data-index="2" data-state="neutral"></div>
             </div>
         </div>
         <div id="result" hidden>
@@ -220,11 +237,39 @@
             return state === "on" ? "off" : state === "off" ? "on" : state;
         }
 
+        const rows = Array.from(document.querySelectorAll(".toggle-row"));
+        function updateActiveRows(activeIndex) {
+            rows.forEach((row, i) => {
+                row.classList.toggle("is-disabled", i > activeIndex);
+            });
+        }
+
+        const arrows = Array.from(document.querySelectorAll(".arrow"));
+        let arrowIndex = 0;
+        let arrowFinished = false;
+        function moveArrow(nextIndex) {
+            if (arrowFinished) return;
+
+            // 🔒 не двигаем стрелку вверх
+            if (nextIndex <= arrowIndex) return;
+
+            arrowIndex = nextIndex;
+
+            arrows.forEach(a => a.textContent = "");
+
+            if (arrowIndex < arrows.length) {
+                arrows[arrowIndex].textContent = "→";
+                updateActiveRows(arrowIndex);
+            } else {
+                arrowFinished = true;
+                updateActiveRows(rows.length);
+            }
+        }
+        moveArrow(0);
+
         function updateResult() {
             const states = toggles.map(t => t.dataset.state);
             if (states.includes("neutral") || countOff(states) !== 1) {
-                result.hidden = true;
-                result.classList.remove("show");
                 return;
             }
             const offIndex = states.indexOf("off");
@@ -264,6 +309,8 @@
                     }
                 }
                 updateResult();
+                const idx = Number(clicked.dataset.index);
+                moveArrow(idx + 1);
             });
         });
     </script>
