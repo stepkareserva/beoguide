@@ -61,13 +61,15 @@
         }
 
         .toggle-list {
-            display: table;
-            width: 100%;
-            border-spacing: 0 12px;
+            display: grid;
+            row-gap: 12px;
         }
 
         .toggle-row {
-            display: table-row;
+            display: grid;
+            grid-template-columns: 28px 1fr auto;
+            align-items: center;
+            column-gap: 12px;
         }
 
         .toggle-row .arrow,
@@ -93,6 +95,21 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+        }
+
+        .arrow-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .label {
+            font-size: 2.2rem;
+        }
+
+        .toggle {
+            width: 52px;
+            height: 28px;
         }
 
         .toggle {
@@ -176,6 +193,22 @@
             font-size: 2rem;
             font-weight: 600;
         }
+
+        .arrow-cell {
+            width: 28px;
+            padding-right: 8px;
+            text-align: center;
+        }
+
+        .arrow {
+            font-size: 2.4rem;
+            line-height: 1;
+            color: #E58DA0;
+            transform: scaleX(1.4);
+            text-shadow:
+                0.5px 0 currentColor,
+                -0.5px 0 currentColor;
+        }
     </style>
 </head>
 
@@ -190,19 +223,25 @@
         <h1>Belgrade weekend breakfast guide</h1>
         <div class="toggle-list">
             <div class="toggle-row">
-                <span class="arrow">→</span>
+                <span class="arrow-cell">
+                    <span class="arrow"></span>
+                </span>
                 <span class="label">Специальный Спешлти Кофе</span>
                 <div class="toggle" data-index="0" data-state="neutral"></div>
             </div>
 
             <div class="toggle-row">
-                <span class="arrow"></span>
+                <span class="arrow-cell">
+                    <span class="arrow"></span>
+                </span>
                 <span class="label">Хенди-мейди Настойки</span>
                 <div class="toggle" data-index="1" data-state="neutral"></div>
             </div>
 
             <div class="toggle-row">
-                <span class="arrow"></span>
+                <span class="arrow-cell">
+                    <span class="arrow"></span>
+                </span>
                 <span class="label">Красивая интерактивная собака</span>
                 <div class="toggle" data-index="2" data-state="neutral"></div>
             </div>
@@ -251,14 +290,14 @@
             if (arrowFinished) return;
 
             // 🔒 не двигаем стрелку вверх
-            if (nextIndex <= arrowIndex) return;
+            if (nextIndex < arrowIndex) return;
 
             arrowIndex = nextIndex;
 
             arrows.forEach(a => a.textContent = "");
 
             if (arrowIndex < arrows.length) {
-                arrows[arrowIndex].textContent = "→";
+                arrows[arrowIndex].textContent = "➤";
                 updateActiveRows(arrowIndex);
             } else {
                 arrowFinished = true;
